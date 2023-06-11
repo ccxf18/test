@@ -1,0 +1,58 @@
+pipeline {
+  agent {
+    node {
+      label 'master'
+    }
+  }
+
+  environment {
+    IMAGE_NAME = 'house/house-asset-h5'
+    DATE = sh (returnStdout: true, script: 'date +%y%m%d%H%M%S').trim()
+    SHORT = sh (returnStdout: true, script: "echo ${GIT_COMMIT}|cut -c 1-8").trim()
+    IMAGE_TAG = "${GIT_BRANCH}_latest".replaceAll("/","-")
+
+  }
+
+  stages {
+
+    stage('Npm Build') {
+      agent {
+        docker {
+          image 'node:15'
+          label 'master'
+          args '-v ${CI_HOME}/node:/root/ --network ${NETWORK}'
+          reuseNode 'true'
+        }
+      }
+      environment {
+        HOME = "${JENKINS_HOME}"
+      }
+      steps {
+        sh "npm config set registry https://registry.npm.taobao.org"
+        sh "npm config ls -l"
+        sh "npm install --verbose"
+        sh "npm run build"
+      }
+    }
+
+    stage('Docker Deploy'){
+      steps {
+
+        sh "docker build -t ${DOCKER_HUB_HOST}/${IMAGE_NAME}:${IMAGE_TAG} ."
+
+        withCredentials([usernamePassword(credentialsId: 'docker-register', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
+          sh "docker login ${DOCKER_HUB_HOST} -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD} "
+          sh "docker push ${DOCKER_HUB_HOST}/${IMAGE_NAME}:${IMAGE_TAG}"
+        }
+
+        script {
+          if ( "${GIT_BRANCH}" != "master" ) {
+          sh "kubectl set image deployment/house-h5-deployment  house-h5=${DOCKER_HUB_HOST}/${IMAGE_NAME}:${IMAGE_TAG} --record -n dev"
+          sh "kubectl delete pod -l app=house-h5 -n dev"
+          }
+        }
+      }
+    }
+
+  }
+}

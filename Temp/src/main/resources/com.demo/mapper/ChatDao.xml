@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.dao.ChatDao">
+  <resultMap id="BaseResultMap" type="com.demo.pojo.Chat">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
+    <result column="collect" jdbcType="INTEGER" property="collect" />
+    <result column="like" jdbcType="INTEGER" property="like" />
+    <result column="author" jdbcType="VARCHAR" property="author" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, content, `time`, `collect`, `like`, author
+  </sql>
+  <select id="loadpage" resultType="java.lang.Integer">
+    select count(*) from chat
+  </select>
+  <select id="fuzzyQuery" resultType="com.demo.pojo.Chat">
+    select * from chat where content like "%${content}%"
+  </select>
+  <select id="findAll" resultType="com.demo.pojo.Chat">
+    select *
+    from chat
+    limit ${(page-1) * (pagesize)},#{pagesize,jdbcType=INTEGER}
+  </select>
+  <select id="findAllCollect" resultType="com.demo.pojo.Chat">
+    select * from chat
+    join collect on chat.id = collect.chatId
+    and collect.userName = #{userName,jdbcType=VARCHAR}
+  </select>
+  <select id="findAllLike" resultType="com.demo.pojo.Chat">
+    select * from chat
+    join `like` on chat.id = `like`.chatId
+    and `like`.userName = #{userName,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from chat
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from chat
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.demo.pojo.Chat" useGeneratedKeys="true">
+    insert into chat (content, `time`, `collect`, 
+      `like`, author)
+    values (#{content,jdbcType=VARCHAR}, #{time,jdbcType=TIMESTAMP}, #{collect,jdbcType=INTEGER}, 
+      #{like,jdbcType=INTEGER}, #{author,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.demo.pojo.Chat" useGeneratedKeys="true">
+    insert into chat
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="content != null">
+        content,
+      </if>
+      <if test="time != null">
+        `time`,
+      </if>
+      <if test="collect != null">
+        `collect`,
+      </if>
+      <if test="like != null">
+        `like`,
+      </if>
+      <if test="author != null">
+        author,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="collect != null">
+        #{collect,jdbcType=INTEGER},
+      </if>
+      <if test="like != null">
+        #{like,jdbcType=INTEGER},
+      </if>
+      <if test="author != null">
+        #{author,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.demo.pojo.Chat">
+    update chat
+    <set>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        `time` = #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="collect != null">
+        `collect` = #{collect,jdbcType=INTEGER},
+      </if>
+      <if test="like != null">
+        `like` = #{like,jdbcType=INTEGER},
+      </if>
+      <if test="author != null">
+        author = #{author,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.demo.pojo.Chat">
+    update chat
+    set content = #{content,jdbcType=VARCHAR},
+      `time` = #{time,jdbcType=TIMESTAMP},
+      `collect` = #{collect,jdbcType=INTEGER},
+      `like` = #{like,jdbcType=INTEGER},
+      author = #{author,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

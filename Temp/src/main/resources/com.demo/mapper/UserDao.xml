@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.demo.dao.UserDao">
+  <resultMap id="BaseResultMap" type="com.demo.pojo.User">
+    <id column="username" jdbcType="VARCHAR" property="username" />
+    <result column="userpwd" jdbcType="VARCHAR" property="userpwd" />
+    <result column="disable" jdbcType="INTEGER" property="disable" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="realname" jdbcType="VARCHAR" property="realname" />
+    <result column="gender" jdbcType="VARCHAR" property="gender" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="age" jdbcType="INTEGER" property="age" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    username, userpwd, `disable`, `time`, email, realname, gender, address, phone, age
+  </sql>
+  <select id="loadpage" resultType="java.lang.Integer">
+    select count(*) from user
+  </select>
+  <select id="findAll" resultType="com.demo.pojo.User">
+    select * from user limit ${(page-1) * (pagesize)},#{pagesize,jdbcType=INTEGER}
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user
+    where username = #{username,jdbcType=VARCHAR}
+  </select>
+  <select id="fuzzyQuery" resultType="com.demo.pojo.User">
+    select * from user where realname like "%${name}%"
+  </select>
+  <select id="selectByUserNameAndPassword" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from user
+    where username = #{username,jdbcType=VARCHAR} and userpwd = #{password,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from user
+    where username = #{username,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" keyColumn="username" keyProperty="username" parameterType="com.demo.pojo.User" useGeneratedKeys="true">
+    insert into user (userpwd, `disable`, `time`, 
+      email, realname, gender, 
+      address, phone, age
+      )
+    values (#{userpwd,jdbcType=VARCHAR}, #{disable,jdbcType=INTEGER}, #{time,jdbcType=TIMESTAMP}, 
+      #{email,jdbcType=VARCHAR}, #{realname,jdbcType=VARCHAR}, #{gender,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="username" keyProperty="username" parameterType="com.demo.pojo.User" useGeneratedKeys="true">
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="username != null">
+        username,
+      </if>
+      <if test="userpwd != null">
+        userpwd,
+      </if>
+      <if test="disable != null">
+        `disable`,
+      </if>
+      <if test="time != null">
+        `time`,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+      <if test="realname != null">
+        realname,
+      </if>
+      <if test="gender != null">
+        gender,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="age != null">
+        age,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="userpwd != null">
+        #{userpwd,jdbcType=VARCHAR},
+      </if>
+      <if test="disable != null">
+        #{disable,jdbcType=INTEGER},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="realname != null">
+        #{realname,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null">
+        #{gender,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null">
+        #{age,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.demo.pojo.User">
+    update user
+    <set>
+      <if test="userpwd != null">
+        userpwd = #{userpwd,jdbcType=VARCHAR},
+      </if>
+      <if test="disable != null">
+        `disable` = #{disable,jdbcType=INTEGER},
+      </if>
+      <if test="time != null">
+        `time` = #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="realname != null">
+        realname = #{realname,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null">
+        gender = #{gender,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null">
+        age = #{age,jdbcType=INTEGER},
+      </if>
+    </set>
+    where username = #{username,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.demo.pojo.User">
+    update user
+    set userpwd = #{userpwd,jdbcType=VARCHAR},
+      `disable` = #{disable,jdbcType=INTEGER},
+      `time` = #{time,jdbcType=TIMESTAMP},
+      email = #{email,jdbcType=VARCHAR},
+      realname = #{realname,jdbcType=VARCHAR},
+      gender = #{gender,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      age = #{age,jdbcType=INTEGER}
+    where username = #{username,jdbcType=VARCHAR}
+  </update>
+</mapper>
